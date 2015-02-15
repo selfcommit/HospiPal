@@ -1,58 +1,243 @@
 from django.db import models
 
-class Hash(models.Model):
-	read_key = models.CharField(max_length = 33, blank = False)
-	write_key = models.CharField(max_length = 34, null = True, blank = True)
-	date_added = models.DateTimeField(auto_now_add = True, editable = False)
-	date_updated = models.DateTimeField(auto_now_add = True, auto_now = True, editable = False)
-	thankyous = models.IntegerField(null = True, blank = True, editable = False)
-	looks = models.IntegerField(null = True, blank = True, editable = False)
-	deleted = models.BooleanField(default = False)
-	date_deleted = models.DateTimeField(null = True, editable = True)
-	#comments
+class Skill(models.Model):
+	name = models.CharField(max_length = 33, blank = False)
 
 	def __unicode__(self):
-		return self.read_key
+		return self.name
 
-class Movie(models.Model):
-	hashes = models.ManyToManyField( Hash, null = True, blank = True, verbose_name = "all hashes for a given Movie")
-	name = models.CharField(max_length = 255)
-	tvdbid = models.IntegerField()
-	banner_path = models.CharField(max_length = 255)
-	banner = models.ImageField(upload_to = 'movie_banners')
-	looks = models.IntegerField(null = True, blank = True, editable = False)
-	overview = models.TextField(null = True, blank = True)
-	runtime = models.CharField(null = True, blank = True, max_length = 4)
-	tagline = models.TextField(null = True, blank = True)
-	genre = models.CharField(null = True, blank = True, max_length = 64)
-	info_url = models.CharField(null = True, blank = True, max_length = 255)
+class Person(models.Model):
+	ssn = models.IntegerField()
+
+	GENDER_CHOICE = (
+		('M', 'Male'),
+		('F', 'Female'),
+	)
+
+	date_of_birth = models.DateTimeField()
+	gender = models.CharField(max_length=1, choices=GENDER_CHOICE)
+	first_name = models.CharField(max_length = 33)
+	last_name =  models.CharField(max_length = 33)
+	street1 = models.CharField(max_length=255, blank=False)
+	street2 = models.CharField(max_length=255, blank=True)
+	city = models.CharField(max_length=255, blank=False)
+	state = models.CharField(max_length=255, blank=False)
+	zipcode = models.CharField(max_length=255, blank=False)
+	telephone = models.CharField(max_length=33, blank=False)
 	
+	def _get_full_name(self):
+		"Returns the Full Person Name"
+		return '%s %s' % (self.first_name, self.last_name)
+
+	name = property(_get_full_name)
+
 	def __unicode__(self):
 		return self.name
 
-class Show(models.Model):
-	name = models.CharField(max_length = 255)
-	tvdbid = models.IntegerField(unique = True)
-	banner = models.ImageField(upload_to = 'TV_banners')
-	banner_path = models.CharField(max_length = 255, null = True, blank = True)
-	poster_path = models.CharField(max_length = 255, null = True, blank = True)
-	overview = models.TextField(null = True, blank = True)
-	status = models.CharField(max_length = 16, null = True, blank = True)
-	Airs_DayOfWeek = models.CharField(max_length = 16, null = True, blank = True)
-	Airs_Time = models.CharField(max_length = 16, null = True, blank = True)
-	click = models.IntegerField(null = True, blank = True, editable = False)
-	all_season_hashes = models.ManyToManyField( Hash, null = True, blank = True, verbose_name = "Hashes containing All Seasons")
-	looks = models.IntegerField(null = True, blank = True, editable = False)
-	#comments
+class Surgeon(models.Model):
+	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	skills = models.ManyToManyField(Skill)
+
+	def __unicode__(self):	
+		return 'Surgeon %s %s' % (str(self.id),str(self.pk))
+
+class Physician(models.Model):
+	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	skill = models.ForeignKey(Skill)
+	salary_amount = models.IntegerField(blank=True,null=True)
+	ownership = models.BooleanField(default = False)
+
+
+	def __unicode__(self):	
+		return 'Physician %s' % str(self.id)
+
+class Staff(models.Model):
+	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	salary_amount = models.IntegerField(blank=True,null=True)
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	def __unicode__(self):	
+		return 'Staffer %s' % str(self.id)
+
+class Nurse(models.Model):
+	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	salary_amount = models.IntegerField(blank=True,null=True)
+	years_experience = models.IntegerField('Years of Experience')
+	skill = models.ForeignKey(Skill)
+
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+		
+	def __unicode__(self):	
+		return 'Nurse %s' % str(self.id)
+
+
+class Theater(models.Model):
+	name = models.CharField(max_length = 33, blank = False)
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
 	def __unicode__(self):
 		return self.name
 
-class Season(models.Model):
-	show = models.ForeignKey(Show, verbose_name = "Season of")
-	hashes = models.ManyToManyField( Hash, null = True, blank = True, verbose_name = "all hashes for a given season")
-	number = models.IntegerField()
-	looks = models.IntegerField(null = True, blank = True, editable = False)
+class Illness_Type(models.Model):
+	name = models.CharField(max_length = 33, blank = False)
+	ILLNESS_CHOICE = (
+		('A', 'Allergie'),
+		('D', 'Disease'),
+	)
+	category = models.CharField(max_length = 1, choices=ILLNESS_CHOICE)
+	description = models.CharField(max_length = 255)
 
 	def __unicode__(self):
-		return u'%s %d' % (self.show, self.number)
-# Create your models here.
+		return self.name
+
+class Illness(models.Model):
+	name = models.ForeignKey(Illness_Type, related_name = 'name_of_illness')
+
+	def __unicode__(self):
+		return str(self.name)
+
+class Patient(models.Model):
+	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	primary = models.ForeignKey(Physician)
+	illness = models.ManyToManyField(Illness)
+	hdl = models.CharField(max_length = 33)
+	ldl = models.CharField(max_length = 33)
+	tri = models.CharField(max_length = 33)
+	blood_sugar = models.CharField(max_length = 33)
+	needs_surgery = models.BooleanField(default = False)
+	date_admitted = models.DateTimeField('date_admitted', auto_now_add=True, editable=False)
+	date_discharged = models.DateTimeField(blank=True)
+
+	UNIT_CHOICE = (
+		('1', 'One'),
+		('2', 'Two'),
+		('3', 'Three'),
+		('4', 'Four'),
+		('5', 'Five'),
+		('6', 'Six'),
+		('7', 'Seven'),
+	)
+	nursing_unit = models.CharField(max_length = 1, choices=UNIT_CHOICE, blank=True)
+
+	ROOM_CHOICE = (
+		('B', 'Blue'),
+		('G', 'Green'),
+	)
+
+	room_number = models.CharField(max_length = 1, choices=ROOM_CHOICE, blank=True)
+
+	BED_CHOICE = (
+		('A', 'Bed A'),
+		('B', 'Bed B'),
+	)
+
+	bed_label = models.CharField(max_length = 1, choices=BED_CHOICE, blank=True)
+	attending_nurse = models.ForeignKey(Nurse, null=True)
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+
+	def _get_location(self):
+		"Returns Patient Location"
+		return '%s %s %s' % (self.nursing_unit, self.room_number, self.bed_label)
+	def __unicode__(self):
+		return 'Patient %s' % (str(self.id))
+
+class Surgery_Type(models.Model):
+
+	name = models.CharField(max_length = 33, blank = False)
+
+	CATEGORY_CHOICE = (
+		('H', 'Hospitalization'),
+		('O', 'Outpatient'),
+	)
+	category = models.CharField(max_length = 1, choices=CATEGORY_CHOICE)
+	anatomical_location = models.CharField(max_length = 33)
+	special_needs = models.CharField(max_length = 33)
+	skills = models.ManyToManyField(Skill, related_name = 'skills_for_surgerytype')
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+
+	def __unicode__(self):
+		return self.name
+
+class Surgery(models.Model):
+	surgery_type = models.ForeignKey(Surgery_Type)
+	date_performed = models.DateTimeField()
+	nurses = models.ManyToManyField(Nurse)
+	surgeons = models.ManyToManyField(Surgeon)
+	patient = models.ForeignKey(Patient, related_name = 'patients_in_surgery')
+	theater = models.ForeignKey(Theater, related_name = 'theater_of_surgery')
+	skills = models.ManyToManyField(Skill)
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+
+	def __unicode__(self):
+		return '%s to operate on %s in %s' %(self.surgeon, self.patient, self.theater)
+
+class Consultation(models.Model):
+	patient = models.ForeignKey(Patient)
+	doctor = models.ForeignKey(Physician)
+	date_of_consult = models.DateTimeField()
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+
+	def __unicode__(self):
+		return self.name
+
+
+class Medication(models.Model):
+	name = models.CharField(max_length = 33, blank = False)
+	quantity_on_hand = models.IntegerField()
+	quantity_on_order = models.IntegerField()
+	unit_cost = models.IntegerField()
+	year_to_date = models.DateTimeField('year_to_date', auto_now_add=True, editable=False)
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+
+	def __unicode__(self):
+		return self.name
+
+class Medication_Interaction(models.Model):
+	prescribed_drug = models.ForeignKey(Medication, related_name='prescribed_drug')
+	interfering_drug = models.ForeignKey(Medication, related_name='interfering_drug')
+	INTERACTION_CHOICE = (
+		('S', 'Severe interaction'),
+		('M', 'Moderate interaction'),
+		('L', 'Little interaction'),
+		('N', 'No interaction'),				
+	)
+	interaction = models.CharField(max_length = 1, choices=INTERACTION_CHOICE)
+
+	def __unicode__(self):
+		return '%s interfers with %s' % (self.prescribed_drug, self.interfering_drug)
+
+class Prescription(models.Model):
+	medication = models.ForeignKey(Medication)
+	prescriber = models.ForeignKey(Physician)
+	patient = models.ForeignKey(Patient)
+	dosage = models.CharField(max_length = 33, blank = False)
+	frequency = models.CharField(max_length = 33, blank = False)
+
+	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+
+	def __unicode__(self):
+		return '%s prescribed for %s %s %s on %s' %(self.medication, self.patient, self.dosage, self.frequency, self.date_added)
+
+class Contract(models.Model):
+	surgeon = models.ForeignKey(Surgeon)
+	skills = models.ManyToManyField(Skill)
+	years = models.IntegerField('Term of Contract in years')
+
+class Corporation(models.Model):
+	name = models.CharField(max_length = 33, blank = False, unique = True)
+	headquarters = models.CharField(max_length = 33, blank = False)
+
