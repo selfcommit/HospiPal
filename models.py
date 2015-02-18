@@ -65,7 +65,7 @@ class Nurse(models.Model):
 	salary_amount = models.IntegerField(blank=True,null=True)
 	years_experience = models.IntegerField('Years of Experience')
 	skill = models.ForeignKey(Skill)
-
+	grade = models.CharField(max_length=1)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
 	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
@@ -240,4 +240,5 @@ class Contract(models.Model):
 class Corporation(models.Model):
 	name = models.CharField(max_length = 33, blank = False, unique = True)
 	headquarters = models.CharField(max_length = 33, blank = False)
+	percent = models.IntegerField()
 
