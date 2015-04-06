@@ -1,11 +1,5 @@
 from django.db import models
 
-class Skill(models.Model):
-	name = models.CharField(max_length = 33, blank = False)
-
-	def __unicode__(self):
-		return self.name
-
 class Person(models.Model):
 	ssn = models.IntegerField()
 
@@ -30,6 +24,12 @@ class Person(models.Model):
 		return '%s %s' % (self.first_name, self.last_name)
 
 	name = property(_get_full_name)
+
+	def __unicode__(self):
+		return self.name
+
+class Skill(models.Model):
+	name = models.CharField(max_length = 33, blank = False)
 
 	def __unicode__(self):
 		return self.name
