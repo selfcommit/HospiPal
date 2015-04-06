@@ -35,14 +35,14 @@ class Skill(models.Model):
 		return self.name
 
 class Surgeon(models.Model):
-	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	id = models.OneToOneField(Person, primary_key=True)
 	skills = models.ManyToManyField(Skill)
 
 	def __unicode__(self):	
 		return 'Surgeon %s %s' % (str(self.id),str(self.pk))
 
 class Physician(models.Model):
-	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	id = models.OneToOneField(Person, primary_key=True)
 	skill = models.ForeignKey(Skill)
 	salary_amount = models.IntegerField(blank=True,null=True)
 	ownership = models.BooleanField(default = False)
@@ -52,23 +52,23 @@ class Physician(models.Model):
 		return 'Physician %s' % str(self.id)
 
 class Staff(models.Model):
-	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	id = models.OneToOneField(Person, primary_key=True)
 	salary_amount = models.IntegerField(blank=True,null=True)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 	def __unicode__(self):	
 		return 'Staffer %s' % str(self.id)
 
 class Nurse(models.Model):
-	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	id = models.OneToOneField(Person, primary_key=True)
 	salary_amount = models.IntegerField(blank=True,null=True)
 	years_experience = models.IntegerField('Years of Experience')
 	skill = models.ForeignKey(Skill)
 	grade = models.CharField(max_length=1)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 		
 	def __unicode__(self):	
 		return 'Nurse %s' % str(self.id)
@@ -78,7 +78,7 @@ class Theater(models.Model):
 	name = models.CharField(max_length = 33, blank = False)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 	def __unicode__(self):
 		return self.name
 
@@ -101,7 +101,7 @@ class Illness(models.Model):
 		return str(self.name)
 
 class Patient(models.Model):
-	id = models.ForeignKey(Person, unique=True, primary_key=True)
+	id = models.OneToOneField(Person, primary_key=True)
 	primary = models.ForeignKey(Physician)
 	illness = models.ManyToManyField(Illness)
 	hdl = models.CharField(max_length = 33)
@@ -139,7 +139,7 @@ class Patient(models.Model):
 	attending_nurse = models.ForeignKey(Nurse, null=True)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 
 	def _get_location(self):
 		"Returns Patient Location"
@@ -161,7 +161,7 @@ class Surgery_Type(models.Model):
 	skills = models.ManyToManyField(Skill, related_name = 'skills_for_surgerytype')
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 
 	def __unicode__(self):
 		return self.name
@@ -176,7 +176,7 @@ class Surgery(models.Model):
 	skills = models.ManyToManyField(Skill)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 
 	def __unicode__(self):
 		return '%s to operate on %s in %s' %(self.surgeon, self.patient, self.theater)
@@ -187,7 +187,7 @@ class Consultation(models.Model):
 	date_of_consult = models.DateTimeField()
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 
 	def __unicode__(self):
 		return self.name
@@ -200,7 +200,7 @@ class Medication(models.Model):
 	unit_cost = models.IntegerField()
 	year_to_date = models.DateTimeField('year_to_date', auto_now_add=True, editable=False)
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 
 	def __unicode__(self):
 		return self.name
@@ -227,7 +227,7 @@ class Prescription(models.Model):
 	frequency = models.CharField(max_length = 33, blank = False)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
-	date_updated = models.DateTimeField('date_updated',auto_now_add=True, auto_now=True, editable=False)
+	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 
 	def __unicode__(self):
 		return '%s prescribed for %s %s %s on %s' %(self.medication, self.patient, self.dosage, self.frequency, self.date_added)
