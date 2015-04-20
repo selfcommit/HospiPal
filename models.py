@@ -8,7 +8,7 @@ class Person(models.Model):
 		('F', 'Female'),
 	)
 
-	date_of_birth = models.DateTimeField()
+	date_of_birth = models.DateField()
 	gender = models.CharField(max_length=1, choices=GENDER_CHOICE)
 	first_name = models.CharField(max_length = 33)
 	last_name =  models.CharField(max_length = 33)
@@ -35,33 +35,31 @@ class Skill(models.Model):
 		return self.name
 
 class Surgeon(models.Model):
-	id = models.OneToOneField(Person, primary_key=True)
+	person = models.OneToOneField(Person, primary_key=True)
 	skills = models.ManyToManyField(Skill)
 
 	def __unicode__(self):	
-		return 'Surgeon %s %s' % (str(self.id),str(self.pk))
+		return 'Surgeon %s' % str(self.person)
 
 class Physician(models.Model):
-	id = models.OneToOneField(Person, primary_key=True)
+	person = models.OneToOneField(Person, primary_key=True)
 	skill = models.ForeignKey(Skill)
 	salary_amount = models.IntegerField(blank=True,null=True)
 	ownership = models.BooleanField(default = False)
-
-
 	def __unicode__(self):	
-		return 'Physician %s' % str(self.id)
+		return 'Physician %s' % str(self.person)
 
 class Staff(models.Model):
-	id = models.OneToOneField(Person, primary_key=True)
+	person = models.OneToOneField(Person, primary_key=True)
 	salary_amount = models.IntegerField(blank=True,null=True)
 
 	date_added = models.DateTimeField('date_added',auto_now_add=True, editable=False)
 	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 	def __unicode__(self):	
-		return 'Staffer %s' % str(self.id)
+		return 'Staffer %s' % str(self.person)
 
 class Nurse(models.Model):
-	id = models.OneToOneField(Person, primary_key=True)
+	person = models.OneToOneField(Person, primary_key=True)
 	salary_amount = models.IntegerField(blank=True,null=True)
 	years_experience = models.IntegerField('Years of Experience')
 	skill = models.ForeignKey(Skill)
@@ -71,7 +69,7 @@ class Nurse(models.Model):
 	date_updated = models.DateTimeField('date_updated',auto_now_add=True, editable=False)
 		
 	def __unicode__(self):	
-		return 'Nurse %s' % str(self.id)
+		return 'Nurse %s' % str(self.person)
 
 
 class Theater(models.Model):
@@ -101,7 +99,7 @@ class Illness(models.Model):
 		return str(self.name)
 
 class Patient(models.Model):
-	id = models.OneToOneField(Person, primary_key=True)
+	person = models.OneToOneField(Person, primary_key=True)
 	primary = models.ForeignKey(Physician)
 	illness = models.ManyToManyField(Illness)
 	hdl = models.CharField(max_length = 33)
@@ -145,7 +143,7 @@ class Patient(models.Model):
 		"Returns Patient Location"
 		return '%s %s %s' % (self.nursing_unit, self.room_number, self.bed_label)
 	def __unicode__(self):
-		return 'Patient %s' % (str(self.id))
+		return 'Patient %s' % (str(self.person))
 
 class Surgery_Type(models.Model):
 

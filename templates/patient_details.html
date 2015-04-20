@@ -1,0 +1,14 @@
+{{pat_id}}
+<form action = {% url 'Patient_Details' %} method = "post">
+<h1> Patient Details </h1>
+{% csrf_token %}
+<table>
+{% for field in form %}
+<tr>
+<td>{{field.label}}:</td> <td>{{field}}</td>
+</tr>
+{% endfor %}
+</table>
+<br>
+<input type = "submit" value = "Save" />
+</form>
