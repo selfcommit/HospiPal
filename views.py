@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.http import HttpResponse
-
+from django.forms.models import model_to_dict
+from django.shortcuts import get_object_or_404
 from HospiPal.forms import *
 def index(request):
 
@@ -15,19 +16,77 @@ def Patient_Management(request):
 
 def Add_Patient(request):
 	if request.method == 'POST':
-		ssn = request.POST['ssn']
-		try:
-			person = Person.objects.get(ssn=ssn)
-			return redirect('Patient_Details', pat_id = person.pk)
-			pass
-		except Exception, e:
-			form = New_Patient_Form(initial={'ssn' : ssn})
-			
-			return render(request, 'new_patient_form.html', {'form' : form})
-	
-	form = Add_Patient_Form()
-	return render(request, 'Add_Patient.html', {'form' : form})
+		form = New_Patient_Form(request.POST)
+		if form.is_valid():
+			ssn = request.POST['ssn']
+			primary_pk = request.POST['Primary']
+			nurse_pk = request.POST['Nurse']
+			illness_pks = request.POST['illness']
+			illness_list = []
 
+			for pk in illness_pks:
+				illness_type = Illness_Type.objects.get(pk = pk)
+				illness = Illness()
+				illness.name = illness_type
+				illness.save()
+				illness_list.append(illness)
+			primary = Physician.objects.get(pk=primary_pk )
+			nurse = Nurse.objects.get(pk=nurse_pk)
+			try:
+				person = Person.objects.get(ssn=ssn)
+				patient.person = person
+				patient.primary = primary
+				patient.illness = illness_list
+				patient.hdl = request.POST['hdl']
+				patient.ldl = request.POST['ldl']
+				patient.tri = request.POST['tri']
+				patient.blood_sugar = request.POST['blood_sugar']
+				patient.needs_surgery = request.POST.get('needs_surgery', False)
+				patient.attending_nurse = nurse
+				patient.save()
+				return redirect('Patient_Details', pat_id = person.pk)
+			except Exception, e:
+				person = Person()
+				patient = Patient()
+
+			person.ssn = request.POST['ssn']
+			birth_day = request.POST['date_of_birth_day']
+			birth_month = request.POST['date_of_birth_month']
+			birth_year = request.POST['date_of_birth_year']
+			person.date_of_birth = birth_year+'-'+birth_month+'-'+birth_day
+			person.gender = request.POST['gender']
+			person.first_name = request.POST['first_name']
+			person.last_name = request.POST['last_name']
+			person.street1 = request.POST['street1']
+			person.street2 = request.POST['street2']
+			person.city = request.POST['city']
+			person.state = request.POST['state']
+			person.zipcode = request.POST['zipcode']
+			person.telephone = request.POST['telephone']
+			person.save()
+			patient.person = person
+			patient.primary = primary
+			patient.illness = illness_list
+			patient.hdl = request.POST['hdl']
+			patient.ldl = request.POST['ldl']
+			patient.tri = request.POST['tri']
+			patient.blood_sugar = request.POST['blood_sugar']
+			patient.needs_surgery = request.POST.get('needs_surgery', False)
+			patient.attending_nurse = nurse
+			patient.save()
+
+			return redirect('Patient_Details', pat_id = person.pk)
+		else:
+			return render(request, 'new_patient_form.html', {'form' : form})				
+	
+	form = New_Patient_Form()
+	return render(request, 'new_patient_form.html', {'form' : form})
+
+def Patient_Details(request,pat_id=None):
+	current_url = request.get_full_path()
+	patient = get_object_or_404(Patient, pk=pat_id)
+	p = model_to_dict(patient)
+	return render(request, 'patient_details.html', {'current_url' : current_url, 'patient' : patient, 'p' : p })
 
 def Search_Patient(request):
 	current_url = request.get_full_path()
@@ -35,50 +94,10 @@ def Search_Patient(request):
 
 	return render(request, 'search_details.html', {'current_url' : current_url, 'form' : form })
 
-def Patient_Details(request,pat_id=None):
-	current_url = request.get_full_path()
-	if request.method == 'POST':
-
-		ssn = request.POST['ssn']
-		person = Person()
-		patient = Patient()
-		try:
-			person = Person.objects.get(ssn=ssn)
-			patient = Patient.objects.get(pk=person.pk)
-		except Exception, e:
-			pass
-		person.ssn = request.POST['ssn']
-		person.date_of_birth = request.POST['date_of_birth']
-		person.gender = request.POST['gender']
-		person.first_name = request.POST['first_name']
-		person.last_name = request.POST['last_name']
-		person.street1 = request.POST['street1']
-		person.street2 = request.POST['street2']
-		person.city = request.POST['city']
-		person.state = request.POST['state']
-		person.zipcode = request.POST['zipcode']
-		person.telephone = request.POST['telephone']
-		patient.person = person
-		patient.primary = Physician.objects.get(pk = request.POST['primary'])
-		patient.illness = illness.objects.get(pk = request.POST['illness'])
-		patient.hdl = request.POST['hdl']
-		patient.ldl = request.POST['ldl']
-		patient.tri = request.POST['tri']
-		patient.blood_sugar = request.POST['blood_sugar']
-		patient.needs_surgery = request.POST['needs_surgery']
-		patient.date_discharged = request.POST['date_discharged']
-		person.save(force_update=True)
-		patient.save(force_update=True)
-
-		return redirect('Patient_Details', pat_id = person.pk)
-
-	form = Patient_Details_Form()
-	return render(request, 'patient_details.html', {'current_url' : current_url, 'form' : form, 'pat_id' : pat_id })
 
 def Schedule_Patient(request):
 	current_url = request.get_full_path()
-	form = Physician.objects.all()
-	return render(request, 'patient_detail.html', {'current_url' : current_url, 'form' : form, 'key' : key })
+	return HttpResponse('Schedule_Doctor')
 
 
 

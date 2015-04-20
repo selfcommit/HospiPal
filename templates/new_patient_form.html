@@ -1,13 +1,21 @@
-<form action = {% url 'Patient_Details' %} method = "post">
+<form action = {% url 'Add_Patient' %} method = "post">
 <h1> New Patient Form </h1>
 {% csrf_token %}
 <table>
 {% for field in form %}
 <tr>
 <td>{{field.label}}:</td> <td>{{field}}</td>
+<td> {% for error in field.errors %}<strong>{{ error|escape }}</strong> </div>{% endfor %}</td>
 </tr>
 {% endfor %}
 </table>
 <br>
 <input type = "submit" value = "Submit" />
 </form>
+{% if form.errors %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error">
+    <strong>{{ error|escape }}</strong>
+</div>
+{% endfor %}
+{% endif %}

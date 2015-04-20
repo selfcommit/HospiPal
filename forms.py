@@ -1,11 +1,13 @@
 from django import forms
+from django.forms.extras.widgets import SelectDateWidget
+from django.contrib.admin import widgets 
 from HospiPal.models import *
 
-class Add_Patient_Form(forms.Form):
-	def __init__(self, *args, **kwargs):
-		super(Add_Patient_Form, self).__init__(*args, **kwargs)
+#class Add_Patient_Form(forms.Form):
+#	def __init__(self, *args, **kwargs):
+#		super(Add_Patient_Form, self).__init__(*args, **kwargs)
 		
-	ssn = forms.IntegerField(label="Enter SSN")	
+#	ssn = forms.IntegerField(label="Enter SSN")	
 	#self.fields['illness'] = forms.ChoiceField(choices=illness_choices)
 	
 	
@@ -16,12 +18,12 @@ class New_Patient_Form(forms.Form):
 	('F', 'Female'),
 	)
 	ssn = forms.IntegerField()
-	date_of_birth = forms.DateField()
+	date_of_birth = forms.DateField(widget=SelectDateWidget(years=range(1920, 2025)))
 	gender = forms.ChoiceField(choices=GENDER_CHOICE)
 	first_name = forms.CharField(max_length = 33)
 	last_name =  forms.CharField(max_length = 33)
 	street1 = forms.CharField(max_length=255)
-	street2 = forms.CharField(max_length=255)
+	street2 = forms.CharField(max_length=255, required=False)
 	city = forms.CharField(max_length=255)
 	state = forms.CharField(max_length=255)
 	zipcode = forms.CharField(max_length=255)
@@ -34,7 +36,7 @@ class New_Patient_Form(forms.Form):
 	ldl = forms.CharField(max_length = 33)
 	tri = forms.CharField(max_length = 33)
 	blood_sugar = forms.CharField(max_length = 33)
-	needs_surgery = forms.BooleanField()
+	needs_surgery = forms.BooleanField(required=False)
 
 class Patient_Details_Form(forms.Form):
 	

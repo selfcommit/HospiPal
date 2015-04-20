@@ -1,14 +1,43 @@
-{{pat_id}}
-<form action = {% url 'Patient_Details' %} method = "post">
-<h1> Patient Details </h1>
-{% csrf_token %}
+<h1> Patient Details {{patient.person.name}}</h1>
 <table>
-{% for field in form %}
+
 <tr>
-<td>{{field.label}}:</td> <td>{{field}}</td>
+<td>Attending Nurse:</td><td>{{patient.attending_nurse}}</td>
 </tr>
-{% endfor %}
+<td>Nursing Unit:</td><td>{{patient.nursing_unit}}</td>
+<tr>
+<td>Room Number:</td><td>{{patient.room_number}}</td>
+</tr>
+<tr>
+<td>Bed:</td><td>{{patient.bed_label}}</td><td> <a href=#>Assign a Bed</a> </td>
+</tr>
+<tr>
+<td>Primary:</td><td>{{patient.primary}}</td>
+</tr>
+<tr>
+<td>Illness:</td>
+{% for illness in patient.illness.all %}
+	<td>{{illness}}</td>
+	{% endfor %}
+</tr>
+<tr>
+<td>Blood Sugar:</td><td>{{patient.blood_sugar}}</td>
+</tr>
+<tr>
+<td>TRI:</td><td>{{patient.tri}}</td>
+</tr>
+<tr>
+<td>LDL:</td><td>{{patient.ldl}}</td>
+</tr>
+<tr>
+<td>HDL:</td><td>{{patient.hdl}}</td>
+</tr>
+<tr>
+<td>Needs Surgery:</td><td>{{patient.needs_surgery}}</td><td><a href=#> Schedule Surgery</a> </td>
+</tr>
+<tr>
+<td>Disharge Date:</td><td>{{patient.date_discharged}}</td><td><a href=#> Set Discharge Date</a> </td>
+</tr>
 </table>
 <br>
-<input type = "submit" value = "Save" />
 </form>

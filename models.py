@@ -108,7 +108,7 @@ class Patient(models.Model):
 	blood_sugar = models.CharField(max_length = 33)
 	needs_surgery = models.BooleanField(default = False)
 	date_admitted = models.DateTimeField('date_admitted', auto_now_add=True, editable=False)
-	date_discharged = models.DateTimeField(blank=True)
+	date_discharged = models.DateTimeField(blank=True, null=True)
 
 	UNIT_CHOICE = (
 		('1', 'One'),
