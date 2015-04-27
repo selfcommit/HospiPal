@@ -1,13 +1,3 @@
-<form action = {% url 'Add_Patient' %} method = "post">
-<h1> Patient Details </h1>
-{% csrf_token %}
-<table>
-{% for field in form %}
-<tr>
-<td>{{field.label}}:</td> <td>{{field}}</td>
-</tr>
+{% for patient in patients %}
+<br><a href={% url 'Patient_Details' patient.pk %}> {{patient}}</a> </br>
 {% endfor %}
-</table>
-<br>
-<input type = "submit" value = "Save" />
-</form>

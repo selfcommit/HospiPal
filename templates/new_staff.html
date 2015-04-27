@@ -1,8 +1,8 @@
-<form action = {% url 'Add_Patient' %} method = "post">
-<h1> New Patient Form </h1>
+<form action = {% url 'Add_Medstaff' %} method = "post">
+<h1> New Staff Form </h1>
 {% csrf_token %}
 <table>
-{% for field in patient_form %}
+{% for field in form %}
 <tr>
 <td>{{field.label}}:</td> <td>{{field}}
 {% if field.label == 'Person' %}

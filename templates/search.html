@@ -1,0 +1,13 @@
+<form action = {% url 'Search_Patient' %} method = "post">
+<h1> Search Patients </h1>
+{% csrf_token %}
+<table>
+{% for field in form %}
+<tr>
+<td>{{field.label}}:</td> <td>{{field}}</td>
+</tr>
+{% endfor %}
+</table>
+<br>
+<input type = "submit" value = "Search" />
+</form>

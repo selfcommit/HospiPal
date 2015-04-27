@@ -40,4 +40,12 @@
 </tr>
 </table>
 <br>
+<h2>Appointments:</h2>
+{% for appointment in appointments %}
+    <br>Consultation with {{appointment.doctor}} on {{appointment.date_of_consult}}</br>
+{% endfor %}
+<h2>Past Diagnosis:</h2>
+{% for illness in patient.illness.all %}
+    <br>{{illness}} : </br>
+{% endfor %}
 </form>
