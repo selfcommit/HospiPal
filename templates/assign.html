@@ -1,8 +1,8 @@
-<form action = {% url 'AddPerson' %} method = "post">
-<h1> New Person Form </h1>
+<form action = {{ current_url}} method = "post">
+<h1> {{title}}</h1>
 {% csrf_token %}
 <table>
-{% for field in person_form %}
+{% for field in form %}
 <tr>
 <td>{{field.label}}:</td> <td>{{field}}</td>
 <td> {% for error in field.errors %}<strong>{{ error|escape }}</strong> </div>{% endfor %}</td>

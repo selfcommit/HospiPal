@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Person(models.Model):
-    ssn = models.IntegerField()
+    ssn = models.IntegerField(unique=True)
 
     GENDER_CHOICE = (
         ('M', 'Male'),
@@ -30,21 +30,15 @@ class Person(models.Model):
         return self.name
 
 
-class Staff(models.Model):
+class SupportStaff(models.Model):
     person = models.ForeignKey(Person)
     salary_amount = models.IntegerField(blank=True, null=True)
-    staff_choice = (
-            ('P', 'Physician'),
-            ('N', 'Nurse'),
-            ('S', 'Surgeon'),
-            ('T', 'Support'),
-            ('C', 'Chief'))
-    staff_type = models.CharField(max_length=1, choices=staff_choice)
+
     date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
-        return '%s %s' % (str(self.staff_type), self.person.name)
+        return 'staff %s' % (self.person)
 
 
 class Skill(models.Model):
@@ -57,7 +51,9 @@ class Skill(models.Model):
 class Surgeon(models.Model):
     person = models.OneToOneField(Person, primary_key=True)
     skills = models.ManyToManyField(Skill)
-    staff = models.OneToOneField(Staff)
+    salary_amount = models.IntegerField(blank=True, null=True)
+    date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
+    date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
         return 'Surgeon %s' % str(self.person)
@@ -67,7 +63,9 @@ class Physician(models.Model):
     person = models.OneToOneField(Person, primary_key=True)
     skill = models.ForeignKey(Skill)
     ownership = models.BooleanField(default=False)
-    staff = models.OneToOneField(Staff)
+    salary_amount = models.IntegerField(blank=True, null=True)
+    date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
+    date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
         return 'Physician %s' % str(self.person)
@@ -78,13 +76,20 @@ class Nurse(models.Model):
     years_experience = models.IntegerField('Years of Experience')
     skill = models.ForeignKey(Skill)
     grade = models.CharField(max_length=1)
-    staff = models.OneToOneField(Staff)
-
+    salary_amount = models.IntegerField(blank=True, null=True)
     date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
         return 'Nurse %s' % str(self.person)
+
+
+class Chief(models.Model):
+    physician = models.ForeignKey(Physician)
+    dept = models.CharField(max_length=33)
+
+    def __unicode__(self):
+        return 'Chief %s of %s' % (self.physician, self.dept)
 
 
 class Theater(models.Model):
@@ -97,6 +102,49 @@ class Theater(models.Model):
         return self.name
 
 
+class NursingUnit(models.Model):
+    UNIT_CHOICE = (
+        ('1', 'One'),
+        ('2', 'Two'),
+        ('3', 'Three'),
+        ('4', 'Four'),
+        ('5', 'Five'),
+        ('6', 'Six'),
+        ('7', 'Seven'),
+    )
+    number = models.IntegerField(choices=UNIT_CHOICE)
+    available = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return 'Unit %s' % (self.number)
+
+class NursingRoom(models.Model):
+    ROOM_CHOICE = (
+        ('Blue', 'Blue'),
+        ('Green', 'Green'),
+    )
+    unit = models.ForeignKey(NursingUnit)
+    color = models.CharField(max_length=5, choices=ROOM_CHOICE)
+    available = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return '%s Room %s' % (self.unit, self.color)
+
+
+class Bed(models.Model):
+    BED_CHOICE = (
+        ('A', 'Bed A'),
+        ('B', 'Bed B'),
+    )
+    room = models.ForeignKey(NursingRoom)
+    letter = models.CharField(max_length=1, choices=BED_CHOICE)
+    available = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return 'Unit %s Room %s Bed %s' % (self.room.unit.number,
+                                           self.room.color, self.letter)
+
+
 class Patient(models.Model):
     person = models.OneToOneField(Person, primary_key=True)
     primary = models.ForeignKey(Physician)
@@ -107,32 +155,8 @@ class Patient(models.Model):
     needs_surgery = models.BooleanField(default=False)
     date_admitted = models.DateTimeField('date_admitted', auto_now_add=True, editable=False)
     date_discharged = models.DateTimeField(blank=True, null=True)
-
-    UNIT_CHOICE = (
-        ('1', 'One'),
-        ('2', 'Two'),
-        ('3', 'Three'),
-        ('4', 'Four'),
-        ('5', 'Five'),
-        ('6', 'Six'),
-        ('7', 'Seven'),
-    )
-    nursing_unit = models.CharField(max_length=1, choices=UNIT_CHOICE, blank=True)
-
-    ROOM_CHOICE = (
-        ('B', 'Blue'),
-        ('G', 'Green'),
-    )
-
-    room_number = models.CharField(max_length=1, choices=ROOM_CHOICE, blank=True)
-
-    BED_CHOICE = (
-        ('A', 'Bed A'),
-        ('B', 'Bed B'),
-    )
-
-    bed_label = models.CharField(max_length=1, choices=BED_CHOICE, blank=True)
     attending_nurse = models.ForeignKey(Nurse, null=True)
+    bed = models.ForeignKey(Bed, blank=True)
 
     date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
@@ -212,7 +236,7 @@ class Consultation(models.Model):
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
-        return self.name
+        return '%s with %s at %s' % (self.patient, self.doctor, self.date_of_consult.strftime('%H:%M'))
 
 
 class Medication(models.Model):

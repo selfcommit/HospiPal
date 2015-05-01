@@ -1,17 +1,14 @@
-<form action = {% url 'Add_Medstaff' %} method = "post">
-<h1> New Staff Form </h1>
+<form action = {{current_url}} method = "post">
+<h1> {{title}} </h1>
 {% csrf_token %}
 <table>
+{% for form in forms %}
 {% for field in form %}
 <tr>
-<td>{{field.label}}:</td> <td>{{field}}
-{% if field.label == 'Person' %}
-<a href={%url 'AddPerson' %}> + </a></td>
-{% else %}
-</td>
-{% endif %}
+<td>{{field.label}}:</td> <td>{{field}}</td>
 <td> {% for error in field.errors %}<strong>{{ error|escape }}</strong> </div>{% endfor %}</td>
 </tr>
+{% endfor %}
 {% endfor %}
 </table>
 <br>

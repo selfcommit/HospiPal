@@ -23,17 +23,11 @@ class NewPersonForm(ModelForm):
         widgets = {'date_of_birth': SelectDateWidget(years=range(1920, 2025))}
 
 
-class NewStaffForm(ModelForm):
-    class Meta:
-        model = Staff
-        fields = ['person', 'salary_amount', 'staff_type']
-
-
 class NewPatientForm(ModelForm):
     class Meta:
         model = Patient
-        fields = ['person', 'primary', 'attending_nurse',
-                  'hdl', 'ldl', 'tri', 'blood_sugar',
+        fields = ['person', 'hdl', 'ldl',
+                  'tri', 'primary', 'blood_sugar',
                   'needs_surgery']
     GENDER_CHOICE = (
         ('M', 'Male'),
@@ -41,16 +35,44 @@ class NewPatientForm(ModelForm):
     )
 
 
+class AssignBedForm(forms.Form):
+    patient = forms.ModelChoiceField(queryset=Patient.objects.all(),
+                                     required=True
+                                     )
+    bed = forms.ModelChoiceField(queryset=Bed.objects.filter(available=True))
+
+
+class AssignDoctorForm(forms.Form):
+    patient = forms.ModelChoiceField(queryset=Patient.objects.all(),
+                                     required=True
+                                     )
+    doctor = forms.ModelChoiceField(queryset=Physician.objects.all())
+
+
+class AssignNurseForm(forms.Form):
+    patient = forms.ModelChoiceField(queryset=Patient.objects.all(),
+                                     required=True
+                                     )
+    Nurse = forms.ModelChoiceField(queryset=Nurse.objects.all())
+
+
 class NewSurgeonForm(ModelForm):
     class Meta:
         model = Surgeon
-        fields = ['skills']
+        fields = ['skills', 'salary_amount']
+
+
+class NewSurgeryForm(ModelForm):
+    class Meta:
+        model = Surgery
+        fields = ['surgery_type', 'date_performed', 'nurses',
+                  'surgeons', 'patient', 'theater', 'skills']
 
 
 class NewPhysicianForm(ModelForm):
     class Meta:
         model = Physician
-        fields = ['skill', 'ownership']
+        fields = ['skill', 'ownership', 'salary_amount']
 
 
 class NewSkillForm(ModelForm):
@@ -62,8 +84,13 @@ class NewSkillForm(ModelForm):
 class NewNurseForm(ModelForm):
     class Meta:
         model = Nurse
-        fields = ['years_experience', 'skill', 'grade']
+        fields = ['years_experience', 'skill', 'grade', 'salary_amount']
 
+
+class NewSupportStaffForm(ModelForm):
+    class Meta:
+        model = SupportStaff
+        fields = ['salary_amount']
     # ssn = forms.IntegerField()
     # date_of_birth = forms.DateField(widget=SelectDateWidget(years=range(1920, 2025)))
     # gender = forms.ChoiceField(choices=GENDER_CHOICE)
@@ -87,6 +114,19 @@ class NewNurseForm(ModelForm):
 class Prescription(forms.Form):
     # illness = forms.ModelMultipleChoiceField(queryset=Illness_Type.objects.all())
     pass
+
+
+class ViewDoctorSchedule(forms.Form):
+    physician = forms.ModelChoiceField(queryset=Physician.objects.all(),
+                                       required=True)
+
+
+class ViewDailySchedule(forms.Form):
+    date = forms.DateField(widget=SelectDateWidget(
+                           years=range(date.today().year,
+                                       date.today().year + 2)))
+    physician = forms.ModelChoiceField(queryset=Physician.objects.all(),
+                                       required=True)
 
 
 class Search_Patient_Form(forms.Form):

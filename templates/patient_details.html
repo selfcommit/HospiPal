@@ -45,7 +45,8 @@
     <br>Consultation with {{appointment.doctor}} on {{appointment.date_of_consult}}</br>
 {% endfor %}
 <h2>Past Diagnosis:</h2>
-{% for illness in patient.illness.all %}
-    <br>{{illness}} : </br>
+{% for illness in illness_history %}
+    <br>Diagnosed with {{illness.name}}({{illness.name.category}}) on {{illness.date_added}} </br>
+    <br> Illness Description: {{illness.name.description}}
 {% endfor %}
 </form>

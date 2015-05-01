@@ -1,2 +1,16 @@
+{% include 'IPmenu.html' %}
+<table>
+<td><tr>{% if bed_count > 0 %}Beds Available {% else %} No Beds Available {% endif %}</tr> 
+</td>
+<td> Beds: {{bed_count}}
+</td>
+</table>
+<br><a href={%url 'Assign_Bed' %}>Assign Patient to a Bed</a> </br>
 
-InPatient_Management.html
+<br><a href={%url 'Assign_Doctor' %}>Assign Doctor to Patient</a> </br>
+
+<br><a href={%url 'Assign_Nurse' %}>Assign Nurse to Patient</a> </br>
+
+<br><a href={%url 'Book_Surgery' %}>Book a Surgery</a> </br>
+
+{% include 'footer.html' %}
