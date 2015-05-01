@@ -219,7 +219,7 @@ def View_Surgery(request):
 
 def MedStaff_Management(request):
 
-    return render(request, 'medstaff_management.html')
+    return render(request, 'MedStaff_Management.html')
 
 
 def Schedule_MedStaff(request):
