@@ -17,7 +17,7 @@ def index(request):
 
 def Search(request):
 
-    return HttpResponse('search retults')
+    return render(request, 'search.html', {})
 
 
 def NewPatient(request):
