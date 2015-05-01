@@ -16,8 +16,9 @@ def index(request):
 
 
 def Search(request):
+    current_url = request.get_full_path()
 
-    return render(request, 'search.html', {})
+    return render(request, 'search.html', {'current_url': current_url})
 
 
 def NewPatient(request):
