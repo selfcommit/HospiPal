@@ -224,7 +224,9 @@ class Surgery(models.Model):
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
-        return '%s to operate on %s in %s' % (self.surgeons.all(), self.patient, self.theater)
+        return 'operation on %s in %s on %s' % (self.patient,
+                                                self.theater,
+                                                self.date_performed.strftime('%D/%M'))
 
 
 class Consultation(models.Model):
@@ -264,23 +266,27 @@ class Medication_Interaction(models.Model):
     interaction = models.CharField(max_length=1, choices=INTERACTION_CHOICE)
 
     def __unicode__(self):
-        return '%s interfers with %s' % (self.prescribed_drug, self.interfering_drug)
+        return '%s interacts with %s with severity %s' % (self.prescribed_drug,
+                                                          self.interfering_drug,
+                                                          self.interaction)
 
 
 class Prescription(models.Model):
     medication = models.ForeignKey(Medication)
     prescriber = models.ForeignKey(Physician)
     patient = models.ForeignKey(Patient)
-    diagnosis = models.ManyToManyField(Illness)
     dosage = models.CharField(max_length=33, blank=False)
     frequency = models.CharField(max_length=33, blank=False)
-    consultation = models.ForeignKey(Consultation)
 
     date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
-        return '%s prescribed for %s %s %s on %s' %(self.medication, self.patient, self.dosage, self.frequency, self.date_added)
+        return '%s prescribed for %s %s %s on %s' % (self.medication,
+                                                     self.patient,
+                                                     self.dosage,
+                                                     self.frequency,
+                                                     self.date_added)
 
 
 class Contract(models.Model):
@@ -288,8 +294,19 @@ class Contract(models.Model):
     skills = models.ManyToManyField(Skill)
     years = models.IntegerField('Term of Contract in years')
 
+    def __unicode__(self):
+        return '%s contracted for %s years for %s' % (self.surgeon,
+                                                      self.years,
+                                                      self.skills.all()
+                                                      )
+
 
 class Corporation(models.Model):
     name = models.CharField(max_length=33, blank=False, unique=True)
     headquarters = models.CharField(max_length=33, blank=False)
     percent = models.IntegerField()
+
+    def __unicode__(self):
+        return '%s Corporation located in %s owns %s percent' % (self.name,
+                                                                 self.headquarters,
+                                                                 self.percent)

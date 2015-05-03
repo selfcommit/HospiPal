@@ -6,19 +6,46 @@ from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404
 from HospiPal.forms import *
 from django.db.models import Q
+from itertools import chain
 import datetime
 
 
 def index(request):
 
-    # hashes = Hash.objects.all()
     return render(request, 'index.html')
 
 
 def Search(request):
     current_url = request.get_full_path()
+    search_text = request.GET.get('searchbox', None)
+    title = 'Search Results for: '
+    patients = Patient.objects.filter(Q(person__ssn__startswith=search_text) |
+                                      Q(person__first_name__startswith=search_text) |
+                                      Q(person__last_name__startswith=search_text))
+    doctor_list = Physician.objects.filter(Q(person__ssn__startswith=search_text) |
+                                           Q(person__first_name__startswith=search_text) |
+                                           Q(person__last_name__startswith=search_text))
+    nurse_list = Nurse.objects.filter(Q(person__ssn__startswith=search_text) |
+                                      Q(person__first_name__startswith=search_text) |
+                                      Q(person__last_name__startswith=search_text))
+    surgeon_list = Surgeon.objects.filter(Q(person__ssn__startswith=search_text) |
+                                          Q(person__first_name__startswith=search_text) |
+                                          Q(person__last_name__startswith=search_text))
+    support_list = SupportStaff.objects.filter(Q(person__ssn__startswith=search_text) |
+                                               Q(person__first_name__startswith=search_text) |
+                                               Q(person__last_name__startswith=search_text))
 
-    return render(request, 'search.html', {'current_url': current_url})
+    staff = list(chain(doctor_list, nurse_list, surgeon_list, support_list))
+
+    surgerys = Surgery.objects.filter(Q(surgery_type__name__startswith=search_text) |
+                                      Q(theater__name__startswith=search_text))
+
+    return render(request, 'search_details.html', {'current_url': current_url,
+                                                   'search_text': search_text,
+                                                   'patients': patients,
+                                                   'title': title,
+                                                   'staff': staff,
+                                                   'surgerys': surgerys})
 
 
 def NewPatient(request):
@@ -177,6 +204,76 @@ def Assign_Bed(request):
             patient = Patient.objects.get(pk=request.POST.get('patient', None))
             bed = Bed.objects.get(pk=request.POST.get('bed', None))
             patient.bed = bed
+            patient.save()
+            return redirect('Patient_Details', pat_id=patient.pk)
+
+    return render(request, 'assign.html', {'form': form,
+                                           'current_url': current_url,
+                                           'title': title,
+                                           'initial': initial})
+
+
+def Add_Illness(request):
+    initial = {'patient': request.GET.get('patient', None)}
+    form = AddIllnessForm(initial=initial)
+    current_url = request.get_full_path()
+    title = 'Assign an Illness'
+    if request.method == 'POST':
+        form = AddIllnessForm(request.POST)
+        if form.is_valid():
+            patient = Patient.objects.get(pk=request.POST.get('patient', None))
+            form.save()
+            return redirect('Patient_Details', pat_id=patient.pk)
+
+    return render(request, 'assign.html', {'form': form,
+                                           'current_url': current_url,
+                                           'title': title,
+                                           'initial': initial})
+
+
+def Add_Prescript(request):
+    initial = {'patient': request.GET.get('patient', None)}
+    current_url = request.get_full_path()
+    title = "Add prescription to Patient"
+    form = NewPrescriptForm(initial=initial)
+
+    if request.method == 'POST':
+        form = NewPrescriptForm(request.POST, initial=initial)
+        if form.is_valid():
+            form.save()
+            return redirect('Patient_Details',
+                            pat_id=request.POST.get('patient', None))
+
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'title': title})
+
+
+def Assign_Discharge(request):
+    initial = {'patient': request.GET.get('patient', None)}
+    form = AssignDischargeForm(initial=initial)
+    current_url = request.get_full_path()
+    title = "Assign discharge Date"
+
+    if request.method == 'POST':
+        form = AssignDischargeForm(request.POST, initial=initial)
+        if form.is_valid():
+            patient = Patient.objects.get(pk=request.POST.get('patient', None))
+            time = request.POST['time'].split(':')
+            day = int(request.POST['date_day'])
+            month = int(request.POST['date_month'])
+            year = int(request.POST['date_year'])
+            hour = int(time[0])
+            minute = int(time[1])
+
+            date = datetime.datetime(day=day,
+                                     month=month,
+                                     year=year,
+                                     hour=hour,
+                                     minute=minute,
+                                     ).strftime('%Y-%m-%d %H:%M')
+
+            patient.date_discharged = date
             patient.save()
             return redirect('Patient_Details', pat_id=patient.pk)
 
@@ -439,6 +536,66 @@ def Add_Chief(request):
         return Http404()
 
 
+def Add_Illness_Type(request):
+    title = "Add an Illness_Type to Hospital"
+    current_url = request.get_full_path()
+    if request.method == 'POST':
+        form = NewIllness_TypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewIllness_TypeForm()
+    thing_list = Illness_Type.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
+
+
+def AddMed(request):
+    title = "Add Medication to Hospital"
+    current_url = request.get_full_path()
+    if request.method == 'POST':
+        form = NewMedForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewMedForm()
+    thing_list = Medication.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
+
+
+def AddMedInt(request):
+    title = "Add Drug Interaction to Hospital"
+    current_url = request.get_full_path()
+    if request.method == 'POST':
+        form = NewMedIntForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewMedIntForm()
+    thing_list = Medication_Interaction.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
+
+
+def AddContract(request):
+    title = "Add Contract to Hospital"
+    current_url = request.get_full_path()
+    if request.method == 'POST':
+        form = NewContractForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewContractForm()
+    thing_list = Contract.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
+
+
 def AddSkill(request):
     title = "Add Skills to Hospital"
     current_url = request.get_full_path()
@@ -467,6 +624,22 @@ def AddTheater(request):
                                         'current_url': current_url,
                                         'thing_list': thing_list,
                                         'title': title})
+
+
+def AddCorp(request):
+    current_url = request.get_full_path()
+    title = "Add Corporations to Hospital"
+    if request.method == 'POST':
+        form = NewCorpForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewCorpForm()
+    thing_list = Corporation.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
+
 
 def AddSurgeryType(request):
     current_url = request.get_full_path()

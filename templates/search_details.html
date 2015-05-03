@@ -1,4 +1,57 @@
 {% include 'menu.html' %}
-{% for patient in patients %}
-<br><a href={% url 'Patient_Details' patient.pk %}> {{patient}}</a> </br>
-{% endfor %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{title}}{{search_text}}</h3>
+
+            <div class="tabbable-panel">
+                <div class="tabbable-line">
+                    <ul class="nav nav-tabs ">
+                        <li class="active">
+                            <a href="#tab_default_1" data-toggle="tab">
+                            Patients</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_2" data-toggle="tab">
+                            Staff</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_3" data-toggle="tab">
+                            Surgerys</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_default_1">
+                        <br>
+                            
+                            
+                               {% for patient in patients %}
+                            <br><a href={% url 'Patient_Details' patient.pk %}> {{patient}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_2">
+                            <br>
+                               {% for staffer in staff %}
+                               
+                            <br><a href={% url 'Staff_Details' staffer.pk %}> {{staffer}}</a></br>
+                                {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="tab_default_3">
+                          <br>
+                               {% for surgery in surgerys %}
+                            <br><a href={% url 'View_Surgery' surgery.pk %}> {{surgery}}</a></br>
+                                {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table>
+<tr>
+
+

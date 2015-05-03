@@ -1,7 +1,10 @@
 {% include 'menu.html' %}
-<h1> Patient Details {{patient.person.name}}</h1>
+<h1> Patient Details: {{patient.person.name}}</h1>
 <table>
 
+<tr>
+<td>Social Security Number:</td><td>{{patient.person.ssn}}</td>
+</tr>
 <tr>
 <td>Attending Nurse:</td><td>{{patient.attending_nurse}}</td>
 </tr>
@@ -37,15 +40,19 @@
 <td>Needs Surgery:</td><td>{{patient.needs_surgery}}</td><td><a href={% url 'Book_Surgery'%}?patient={{patient.pk}} > Schedule Surgery</a> </td>
 </tr>
 <tr>
-<td>Disharge Date:</td><td>{{patient.date_discharged}}</td><td><a href=#> Set Discharge Date</a> </td>
+<td>Disharge Date:</td><td>{{patient.date_discharged}}</td><td><a href={% url 'Assign_Discharge'%}?patient={{patient.pk}}> Set Discharge Date</a> </td>
 </tr>
 </table>
 <br>
-<h2>Appointments:</h2>
+<a href={% url 'Add_Prescript' %}?patient={{patient.pk}}>Write a Prescription</a>
+<br>
+<a href={% url 'Add_Illness' %}?patient={{patient.pk}}>Diagnose with Illness</a>
+<br>
+<h3>Appointments:</h3>
 {% for appointment in appointments %}
     <br>Consultation with {{appointment.doctor}} on {{appointment.date_of_consult}}</br>
 {% endfor %}
-<h2>Past Diagnosis:</h2>
+<h3>Past Diagnosis:</h3>
 {% for illness in illness_history %}
     <br>Diagnosed with {{illness.name}}({{illness.name.category}}) on {{illness.date_added}} </br>
     <br> Illness Description: {{illness.name.description}}

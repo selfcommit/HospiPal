@@ -116,6 +116,44 @@ class NewSkillForm(ModelForm):
         fields = ['name']
 
 
+class NewMedForm(ModelForm):
+    class Meta:
+        model = Medication
+        fields = ['name', 'quantity_on_hand', 'quantity_on_order',
+                  'unit_cost']
+
+
+class NewMedIntForm(ModelForm):
+    class Meta:
+        model = Medication_Interaction
+        fields = ['prescribed_drug', 'interfering_drug', 'interaction']
+
+
+class NewContractForm(ModelForm):
+    class Meta:
+        model = Contract
+        fields = ['surgeon', 'skills', 'years']
+
+
+class NewPrescriptForm(ModelForm):
+    class Meta:
+        model = Prescription
+        fields = ['medication', 'prescriber', 'patient',
+                  'dosage', 'frequency']
+
+
+class NewIllness_TypeForm(ModelForm):
+    class Meta:
+        model = Prescription
+        fields = ['name', 'category', 'description']
+
+
+class NewIllnessForm(ModelForm):
+    class Meta:
+        model = Prescription
+        fields = ['name', 'patient']
+
+
 class NewNurseForm(ModelForm):
     class Meta:
         model = Nurse
@@ -128,28 +166,26 @@ class NewTheaterForm(ModelForm):
         fields = ['name']
 
 
+class NewCorpForm(ModelForm):
+    class Meta:
+        model = Corporation
+        fields = ['name', 'headquarters', 'percent']
+
+
+class AssignDischargeForm(forms.Form):
+
+    patient = forms.ModelChoiceField(queryset=Patient.objects.all())
+
+    date = forms.DateField(widget=SelectDateWidget(
+                           years=range(date.today().year,
+                                       date.today().year + 2)))
+    time = forms.TimeField(initial=datetime.now().strftime('%H:%M'), input_formats=['%H:%M'])
+
+
 class NewSupportStaffForm(ModelForm):
     class Meta:
         model = SupportStaff
         fields = ['salary_amount']
-    # ssn = forms.IntegerField()
-    # date_of_birth = forms.DateField(widget=SelectDateWidget(years=range(1920, 2025)))
-    # gender = forms.ChoiceField(choices=GENDER_CHOICE)
-    # first_name = forms.CharField(max_length=33)
-    # last_name = forms.CharField(max_length=33)
-    # street1 = forms.CharField(max_length=255)
-    # street2 = forms.CharField(max_length=255, required=False)
-    # city = forms.CharField(max_length=255)
-    # state = forms.CharField(max_length=255)
-    # zipcode = forms.CharField(max_length=255)
-    # telephone = forms.CharField(max_length=33)
-    # Primary = forms.ModelChoiceField(queryset=Physician.objects.all())
-    # Nurse = forms.ModelChoiceField(queryset=Nurse.objects.all())
-    # hdl = forms.CharField(max_length=33)
-    # ldl = forms.CharField(max_length=33)
-    # tri = forms.CharField(max_length=33)
-    # blood_sugar = forms.CharField(max_length=33)
-    # needs_surgery = forms.BooleanField(required=False)
 
 
 class Prescription(forms.Form):
