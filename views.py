@@ -530,10 +530,18 @@ def Add_Support(request):
 
 
 def Add_Chief(request):
+    form = NewChiefForm()
+    title = "Add a Dept Chief Hospital"
+    current_url = request.get_full_path()
     if request.method == 'POST':
-        return HttpResponse('Things and stuff')
-    else:
-        return Http404()
+        form = NewChiefForm(request.POST)
+        if form.is_valid():
+            form.save()
+    thing_list = Chief.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
 
 
 def Add_Illness_Type(request):

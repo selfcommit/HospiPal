@@ -144,13 +144,13 @@ class NewPrescriptForm(ModelForm):
 
 class NewIllness_TypeForm(ModelForm):
     class Meta:
-        model = Prescription
+        model = Illness_Type
         fields = ['name', 'category', 'description']
 
 
 class NewIllnessForm(ModelForm):
     class Meta:
-        model = Prescription
+        model = Illness
         fields = ['name', 'patient']
 
 
@@ -158,6 +158,12 @@ class NewNurseForm(ModelForm):
     class Meta:
         model = Nurse
         fields = ['years_experience', 'skill', 'grade', 'salary_amount']
+
+
+class NewChiefForm(ModelForm):
+    class Meta:
+        model = Chief
+        fields = ['physician', 'dept']
 
 
 class NewTheaterForm(ModelForm):
