@@ -1,0 +1,7 @@
+{% include 'menu.html' %}
+<h1> Roles Held By: {{person}} </h1>
+{% for list in staff_list %}
+{% for member in list %}
+{{member}}
+{% endfor %}
+{% endfor %}

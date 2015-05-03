@@ -10,7 +10,7 @@
 <td>Room Number:</td><td>{{patient.room_number}}</td>
 </tr>
 <tr>
-<td>Bed:</td><td>{{patient.bed_label}}</td><td> <a href=#>Assign a Bed</a> </td>
+<td>Bed:</td><td>{{patient.bed_label}}</td><td> <a href={% url 'Assign_Bed'%}?patient={{patient.pk}}>Assign a Bed</a> </td>
 </tr>
 <tr>
 <td>Primary:</td><td>{{patient.primary}}</td>
@@ -34,7 +34,7 @@
 <td>HDL:</td><td>{{patient.hdl}}</td>
 </tr>
 <tr>
-<td>Needs Surgery:</td><td>{{patient.needs_surgery}}</td><td><a href=#> Schedule Surgery</a> </td>
+<td>Needs Surgery:</td><td>{{patient.needs_surgery}}</td><td><a href={% url 'Book_Surgery'%}?patient={{patient.pk}} > Schedule Surgery</a> </td>
 </tr>
 <tr>
 <td>Disharge Date:</td><td>{{patient.date_discharged}}</td><td><a href=#> Set Discharge Date</a> </td>

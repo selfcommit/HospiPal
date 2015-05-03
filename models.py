@@ -118,6 +118,7 @@ class NursingUnit(models.Model):
     def __unicode__(self):
         return 'Unit %s' % (self.number)
 
+
 class NursingRoom(models.Model):
     ROOM_CHOICE = (
         ('Blue', 'Blue'),
@@ -156,7 +157,7 @@ class Patient(models.Model):
     date_admitted = models.DateTimeField('date_admitted', auto_now_add=True, editable=False)
     date_discharged = models.DateTimeField(blank=True, null=True)
     attending_nurse = models.ForeignKey(Nurse, null=True)
-    bed = models.ForeignKey(Bed, blank=True)
+    bed = models.ForeignKey(Bed, blank=True, null=True)
 
     date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
@@ -185,14 +186,14 @@ class Illness_Type(models.Model):
 class Illness(models.Model):
     name = models.ForeignKey(Illness_Type, related_name='name_of_illness')
     patient = models.ForeignKey(Patient)
-    date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
+    date_added = models.DateTimeField('date_added',
+                                      auto_now_add=True, editable=False)
 
     def __unicode__(self):
         return '%s %s %s' % (self.name, self.patient, self.date_added)
 
 
 class Surgery_Type(models.Model):
-
     name = models.CharField(max_length=33, blank=False)
 
     CATEGORY_CHOICE = (
@@ -218,13 +219,12 @@ class Surgery(models.Model):
     surgeons = models.ManyToManyField(Surgeon)
     patient = models.ForeignKey(Patient, related_name='patients_in_surgery')
     theater = models.ForeignKey(Theater, related_name='theater_of_surgery')
-    skills = models.ManyToManyField(Skill)
 
     date_added = models.DateTimeField('date_added', auto_now_add=True, editable=False)
     date_updated = models.DateTimeField('date_updated', auto_now_add=True, editable=False)
 
     def __unicode__(self):
-        return '%s to operate on %s in %s' % (self.surgeon, self.patient, self.theater)
+        return '%s to operate on %s in %s' % (self.surgeons.all(), self.patient, self.theater)
 
 
 class Consultation(models.Model):

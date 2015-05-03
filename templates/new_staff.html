@@ -4,7 +4,7 @@
 {% csrf_token %}
 <table>
 {% for form in forms %}
-{% for field in form %}
+{% for field in form.visible_fields %}
 <tr>
 <td>{{field.label}}:</td> <td>{{field}}</td>
 <td> {% for error in field.errors %}<strong>{{ error|escape }}</strong> </div>{% endfor %}</td>

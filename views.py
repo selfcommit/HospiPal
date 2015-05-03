@@ -31,9 +31,10 @@ def NewPatient(request):
         form2 = NewPatientForm(request.POST)
         if form1.is_valid() and form2.is_valid():
             person = form1.save()
-            form2.person = person
-            p = form2.save()
-            return redirect('Patient_Management')
+            patient = form2.save(commit=False)
+            patient.person = person
+            form2.save()
+            return redirect('Patient_Details', pat_id=patient.pk)
     forms = []
     forms.append(form1)
     forms.append(form2)
@@ -49,21 +50,17 @@ def Patient_Management(request):
 
 def Add_Patient(request):
     current_url = request.get_full_path()
-    form = NewPatientForm()
+    form = ExistingPatientForm()
+    title = "Add Existing Patient"
     if request.method == 'POST':
-        form = NewPatientForm(request.POST)
+        form = ExistingPatientForm(request.POST)
         if form.is_valid():
             patient = form.save()
-            # for pk in illness_pks:
-            #    illness_type = Illness_Type.objects.get(pk=pk)
-            #    illness = Illness()
-            #    illness.name = illness_type
-            #    illness.save()
-            #    illness_list.append(illness)
             return redirect('Patient_Details', pat_id=patient.pk)
 
     return render(request, 'add.html',
-                  {'patient_form': form, 'current_url': current_url})
+                  {'form': form, 'current_url': current_url,
+                   'title': title})
 
 
 def Patient_Details(request, pat_id=None):
@@ -92,7 +89,7 @@ def Search_Patient(request):
         return render(request, 'search_details.html', {'patients': patients})
 
     current_url = request.get_full_path()
-    form = Search_Patient_Form()
+    form = SearchPatientForm()
 
     return render(request, 'search.html', {'current_url': current_url, 'form': form})
 
@@ -170,19 +167,37 @@ def InPatient_Management(request):
 
 
 def Assign_Bed(request):
-    form = AssignBedForm()
+    initial = {'patient': request.GET.get('patient', None)}
+    form = AssignBedForm(initial=initial)
     current_url = request.get_full_path()
     title = 'Assign a Bed'
+    if request.method == 'POST':
+        form = AssignBedForm(request.POST)
+        if form.is_valid():
+            patient = Patient.objects.get(pk=request.POST.get('patient', None))
+            bed = Bed.objects.get(pk=request.POST.get('bed', None))
+            patient.bed = bed
+            patient.save()
+            return redirect('Patient_Details', pat_id=patient.pk)
 
     return render(request, 'assign.html', {'form': form,
                                            'current_url': current_url,
-                                           'title': title})
+                                           'title': title,
+                                           'initial': initial})
 
 
 def Assign_Doctor(request):
+    title = 'Assign a Doctor'
     form = AssignDoctorForm()
     current_url = request.get_full_path()
-    title = 'Assign a Doctor'
+    if request.method == 'POST':
+        form = AssignDoctorForm(request.POST)
+        if form.is_valid():
+            patient = Patient.objects.get(pk=request.POST.get('patient', None))
+            doctor = Physician.objects.get(pk=request.POST.get('doctor', None))
+            patient.physician = doctor
+            patient.save()
+            return redirect('Patient_Details', pat_id=patient.pk)
 
     return render(request, 'assign.html', {'form': form,
                                            'current_url': current_url,
@@ -190,10 +205,17 @@ def Assign_Doctor(request):
 
 
 def Assign_Nurse(request):
+    title = 'Assign a Nurse'
     form = AssignNurseForm()
     current_url = request.get_full_path()
-    title = 'Assign a Nurse'
-
+    if request.method == 'POST':
+        form = AssignNurseForm(request.POST)
+        if form.is_valid():
+            patient = Patient.objects.get(pk=request.POST.get('patient', None))
+            nurse = Nurse.objects.get(pk=request.POST.get('nurse', None))
+            patient.attending_nurse = nurse
+            patient.save()
+            return redirect('Patient_Details', pat_id=patient.pk)
     return render(request, 'assign.html', {'form': form,
                                            'current_url': current_url,
                                            'title': title})
@@ -205,17 +227,62 @@ def Remove_Bed(request):
 
 
 def Book_Surgery(request):
-    form = NewSurgeryForm()
-    nurses = Nurse.objects.all()
-    surgeons = Surgeon.objects.all()
+    form = SurgeryFormStep1()
+    current_url = request.get_full_path()
+    title = 'Step1: Select Surgery Type'
+    step = 'step1'
+    if request.method == 'POST':
+        if 'step1' in request.POST:
+            form = SurgeryFormStep1(request.POST)
+            if form.is_valid():
+                step = 'step2'
+                title = 'Step2: Select Staff and Date'
+                surgery_type = request.POST.get('surgery_type', None)
+                surgery_type = Surgery_Type.objects.get(pk=surgery_type)
+                skills = surgery_type.skills.all
+                nurses = Nurse.objects.filter(skill=skills)
+                surgeons = Surgeon.objects.filter(skills=skills)
+                initial = {'patient': request.GET.get('patient', None)}
+                form = NewSurgeryForm(request.POST, initial=initial)
 
-    return render(request, 'schedule.html', {'nurses': nurses,
-                                             'surgeons': surgeons})
+                return render(request, 'schedule.html',
+                              {'form': form,
+                               'current_url': current_url,
+                               'skills': skills,
+                               'surgery_type': surgery_type,
+                               'step': step,
+                               'title': title
+                               })
+        if 'step2' in request.POST:
+            form = NewSurgeryForm(request.POST)
+
+            if form.is_valid():
+                surgery_type = request.POST.get('surgery_type', None)
+                surgery_type = Surgery_Type.objects.get(pk=surgery_type)
+                s = form.save(commit=False)
+                s.surgery_type = surgery_type
+                s.date_performed = datetime.datetime(
+                    day=int(request.POST['date_performed_day']),
+                    month=int(request.POST['date_performed_month']),
+                    year=int(request.POST['date_performed_year']),
+                    )
+                s.save()
+                form.save_m2m()
+                # https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#the-save-method
+                return redirect('View_Surgery', sid=s.pk)
+
+    return render(request, 'schedule.html', {'form': form,
+                                             'current_url': current_url,
+                                             'title': title,
+                                             'step': step})
 
 
-def View_Surgery(request):
+def View_Surgery(request, sid=None):
+    surgery = Surgery.objects.get(pk=sid)
+    current_url = request.get_full_path()
 
-    return HttpResponse("InPatient_Management")
+    return render(request, 'surgery.html', {'surgery': surgery,
+                                            'current_url': current_url})
 
 
 def MedStaff_Management(request):
@@ -228,8 +295,39 @@ def Schedule_MedStaff(request):
 
 
 def Search_MedStaff(request):
-    return HttpResponse('Oh look Medstaff!')
-    pass
+    form = SearchStaffForm()
+    staff_list = []
+    current_url = request.get_full_path()
+    return render(request, 'search.html', {'form': form,
+                                           'staff_list': staff_list,
+                                           'current_url': current_url})
+
+
+def Staff_Details(request, staff_id=None):
+    current_url = request.get_full_path()
+    staff_list = []
+    person = get_object_or_404(Person, pk=staff_id)
+    physician = Physician.objects.filter(person=person)
+    nurse = Nurse.objects.filter(person=person)
+    surgeon = Surgeon.objects.filter(person=person)
+    staff = SupportStaff.objects.filter(person=person)
+
+    if physician:
+        staff_list.append(physician)
+    if nurse:
+        staff_list.append(nurse)
+    if surgeon:
+        staff_list.append(surgeon)
+    if staff:
+        staff_list.append(staff)
+    return render(request, 'staff_details.html',
+                           {'current_url': current_url,
+                            'person': person,
+                            'staff_list': staff_list,
+                            'staff_id': staff_id,
+                            'person': person,
+                            'physician': physician
+                            })
 
 
 def Remove_MedStaff(request):
@@ -246,11 +344,7 @@ def Remove_MedStaff(request):
                                                  'gen_staff': gen_staff})
 
 
-def Add_MedStaff(request):
-    pass
-
-
-def Add_Physician(request, person_id=None, staff_id=None):
+def Add_Physician(request):
     title = 'New Physician Form'
     form1 = NewPersonForm()
     form2 = NewPhysicianForm()
@@ -260,9 +354,10 @@ def Add_Physician(request, person_id=None, staff_id=None):
         form2 = NewPhysicianForm(request.POST)
         if form1.is_valid() and form2.is_valid():
             person = form1.save()
-            form2.person = person
-            p = form2.save()
-            return redirect('Search_MedStaff')
+            p = form2.save(commit=False)
+            p.person = person
+            p.save()
+            return redirect('Staff_Details', staff_id=p.pk)
     forms = []
     forms.append(form1)
     forms.append(form2)
@@ -281,9 +376,10 @@ def Add_Nurse(request):
         form2 = NewNurseForm(request.POST)
         if form1.is_valid() and form2.is_valid():
             person = form1.save()
-            form2.person = person
+            p = form2.save(commit=False)
+            p.person = person
             p = form2.save()
-            return redirect('Search_MedStaff')
+            return redirect('Staff_Details', staff_id=p.pk)
     forms = []
     forms.append(form1)
     forms.append(form2)
@@ -302,9 +398,10 @@ def Add_Surgeon(request):
         form2 = NewSurgeonForm(request.POST)
         if form1.is_valid() and form2.is_valid():
             person = form1.save()
-            form2.person = person
+            p = form2.save(commit=False)
+            p.person = person
             p = form2.save()
-            return redirect('Search_MedStaff')
+            return redirect('Staff_Details', staff_id=p.pk)
     forms = []
     forms.append(form1)
     forms.append(form2)
@@ -323,9 +420,10 @@ def Add_Support(request):
         form2 = NewSupportStaffForm(request.POST)
         if form1.is_valid() and form2.is_valid():
             person = form1.save()
-            form2.person = person
+            p = form2.save(commit=False)
+            p.person = person
             p = form2.save()
-            return redirect('Search_MedStaff')
+            return redirect('Staff_Details', staff_id=p.pk)
     forms = []
     forms.append(form1)
     forms.append(form2)
@@ -342,14 +440,46 @@ def Add_Chief(request):
 
 
 def AddSkill(request):
+    title = "Add Skills to Hospital"
     current_url = request.get_full_path()
     if request.method == 'POST':
         form = NewSkillForm(request.POST)
         if form.is_valid():
             form.save()
     form = NewSkillForm()
-    return render(request, 'add.html', {'form': form, 'current_url': current_url})
+    thing_list = Skill.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
 
 
+def AddTheater(request):
+    current_url = request.get_full_path()
+    title = "Add Theaters to Hospital"
+    if request.method == 'POST':
+        form = NewTheaterForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewTheaterForm()
+    thing_list = Theater.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
+
+def AddSurgeryType(request):
+    current_url = request.get_full_path()
+    title = "Add Surgery Type to Hospital"
+    if request.method == 'POST':
+        form = NewSurgeryTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+    form = NewSurgeryTypeForm()
+    thing_list = Surgery_Type.objects.all()
+    return render(request, 'add.html', {'form': form,
+                                        'current_url': current_url,
+                                        'thing_list': thing_list,
+                                        'title': title})
 def Schedule_MedStaff(request):
     pass

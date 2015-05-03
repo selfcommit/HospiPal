@@ -26,6 +26,18 @@ class NewPersonForm(ModelForm):
 class NewPatientForm(ModelForm):
     class Meta:
         model = Patient
+        fields = ['hdl', 'ldl',
+                  'tri', 'primary', 'blood_sugar',
+                  'needs_surgery']
+    GENDER_CHOICE = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+
+
+class ExistingPatientForm(ModelForm):
+    class Meta:
+        model = Patient
         fields = ['person', 'hdl', 'ldl',
                   'tri', 'primary', 'blood_sugar',
                   'needs_surgery']
@@ -53,7 +65,7 @@ class AssignNurseForm(forms.Form):
     patient = forms.ModelChoiceField(queryset=Patient.objects.all(),
                                      required=True
                                      )
-    Nurse = forms.ModelChoiceField(queryset=Nurse.objects.all())
+    nurse = forms.ModelChoiceField(queryset=Nurse.objects.all())
 
 
 class NewSurgeonForm(ModelForm):
@@ -62,17 +74,40 @@ class NewSurgeonForm(ModelForm):
         fields = ['skills', 'salary_amount']
 
 
+class SurgeryFormStep1(forms.Form):
+    surgery_type = forms.ModelChoiceField(queryset=Surgery_Type.objects.all())
+
+
 class NewSurgeryForm(ModelForm):
+    surgery_type = forms.ModelChoiceField(queryset=Surgery_Type.objects.all(),
+                                          required=False,
+                                          widget=forms.HiddenInput())
+
     class Meta:
         model = Surgery
         fields = ['surgery_type', 'date_performed', 'nurses',
-                  'surgeons', 'patient', 'theater', 'skills']
+                  'surgeons', 'patient', 'theater']
+        widgets = {'date_performed': SelectDateWidget(
+                                     years=range(
+                                         date.today().year,
+                                         date.today().year + 2))}
+
+
+class NewSurgeryTypeForm(ModelForm):
+
+    class Meta:
+        model = Surgery_Type
+        fields = ['name', 'category', 'anatomical_location', 'special_needs',
+                  'skills']
 
 
 class NewPhysicianForm(ModelForm):
+    person = forms.ModelChoiceField(queryset=Person.objects.all(),
+                                    required=False, widget=forms.HiddenInput())
+
     class Meta:
         model = Physician
-        fields = ['skill', 'ownership', 'salary_amount']
+        fields = ['skill', 'person', 'ownership', 'salary_amount']
 
 
 class NewSkillForm(ModelForm):
@@ -85,6 +120,12 @@ class NewNurseForm(ModelForm):
     class Meta:
         model = Nurse
         fields = ['years_experience', 'skill', 'grade', 'salary_amount']
+
+
+class NewTheaterForm(ModelForm):
+    class Meta:
+        model = Theater
+        fields = ['name']
 
 
 class NewSupportStaffForm(ModelForm):
@@ -129,7 +170,13 @@ class ViewDailySchedule(forms.Form):
                                        required=True)
 
 
-class Search_Patient_Form(forms.Form):
+class SearchPatientForm(forms.Form):
+    ssn = forms.IntegerField()
+    first_name = forms.CharField(max_length=33)
+    last_name = forms.CharField(max_length=33)
+
+
+class SearchStaffForm(forms.Form):
     ssn = forms.IntegerField()
     first_name = forms.CharField(max_length=33)
     last_name = forms.CharField(max_length=33)

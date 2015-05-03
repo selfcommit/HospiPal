@@ -1,6 +1,6 @@
 {% include 'menu.html' %}
 <form action = {{current_url}} method = "post">
-<h1> Search Results </h1>
+<h1> Search</h1>
 {% csrf_token %}
 <table>
 {% for field in form %}
