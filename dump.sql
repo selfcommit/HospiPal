@@ -191,13 +191,6 @@ CREATE TABLE "HospiPal_medication_interaction" (
     "interaction" varchar(1) NOT NULL
 )
 ;
-CREATE TABLE "HospiPal_prescription_diagnosis" (
-    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "prescription_id" integer NOT NULL,
-    "illness_id" integer NOT NULL REFERENCES "HospiPal_illness" ("id"),
-    UNIQUE ("prescription_id", "illness_id")
-)
-;
 CREATE TABLE "HospiPal_prescription" (
     "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     "medication_id" integer NOT NULL REFERENCES "HospiPal_medication" ("id"),
@@ -205,7 +198,6 @@ CREATE TABLE "HospiPal_prescription" (
     "patient_id" integer NOT NULL REFERENCES "HospiPal_patient" ("person_id"),
     "dosage" varchar(33) NOT NULL,
     "frequency" varchar(33) NOT NULL,
-    "consultation_id" integer NOT NULL REFERENCES "HospiPal_consultation" ("id"),
     "date_added" datetime NOT NULL,
     "date_updated" datetime NOT NULL
 )
