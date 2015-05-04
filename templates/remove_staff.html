@@ -1,22 +1,28 @@
 {% include 'menu.html' %}
-<form action = {% url 'Remove_MedStaff' %} method = "post">
+<form action = {% url 'Remove_Nurse' %} method = "post">
 {% csrf_token %}
 {% for nurse in nurses %}
 <br>{{nurse}} <input type = "submit" value = "Remove" id ={{nurse.pk}}> </br>
-</form>
 {% endfor %}
+</form>
 
+<form action = {% url 'Remove_Physician' %} method = "post">
+{% csrf_token %}
 {% for physician in physicians %}
 <br>{{physician}} <input type = "submit" value = "Remove" id ={{physician.pk}}> </br>
-</form>
 {% endfor %}
+</form>
 
+<form action = {% url 'Remove_Surgeon' %} method = "post">
+{% csrf_token %}
 {% for surgeon in surgeons %}
 <br>{{surgeon}} <input type = "submit" value = "Remove" id ={{surgeon.pk}}> </br>
-</form>
 {% endfor %}
+</form>
 
+<form action = {% url 'Remove_MedStaff' %} method = "post">
+{% csrf_token %}
 {% for staffer in gen_staff %}
 <br>{{staffer}} <input type = "submit" value = "Remove" id ={{staffer.pk}}> </br>
-</form>
 {% endfor %}
+</form>

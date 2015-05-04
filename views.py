@@ -441,6 +441,21 @@ def Remove_MedStaff(request):
                                                  'gen_staff': gen_staff})
 
 
+def Remove_Physician(request):
+
+    return HttpResponse('Remove Physician')
+
+
+def Remove_Nurse(request):
+
+    return HttpResponse('Remove Nurse')
+
+
+def Remove_Surgeon(request):
+
+    return HttpResponse('Remove Surgeon')
+
+
 def Add_Physician(request):
     title = 'New Physician Form'
     form1 = NewPersonForm()
