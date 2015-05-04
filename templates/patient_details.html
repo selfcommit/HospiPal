@@ -8,12 +8,12 @@
 <tr>
 <td>Attending Nurse:</td><td>{{patient.attending_nurse}}</td>
 </tr>
-<td>Nursing Unit:</td><td>{{patient.nursing_unit}}</td>
+<td>Nursing Unit:</td><td>{{patient.bed.room.unit}}</td>
 <tr>
-<td>Room Number:</td><td>{{patient.room_number}}</td>
+<td>Room Number:</td><td>{{patient.bed.room.color}}</td>
 </tr>
 <tr>
-<td>Bed:</td><td>{{patient.bed_label}}</td><td> <a href={% url 'Assign_Bed'%}?patient={{patient.pk}}>Assign a Bed</a> </td>
+<td>Bed:</td><td>{{patient.bed.letter}}</td><td> <a href={% url 'Assign_Bed'%}?patient={{patient.pk}}>Assign a Bed</a> </td>
 </tr>
 <tr>
 <td>Primary:</td><td>{{patient.primary}}</td>
