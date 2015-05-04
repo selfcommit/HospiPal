@@ -1,17 +1,12 @@
 from datetime import *
+from itertools import chain
 from django import forms
 from django.forms import ModelForm
 from django.forms.widgets import *
 from django.forms.extras.widgets import SelectDateWidget
 from django.contrib.admin import widgets
+from django.db.models import get_model
 from HospiPal.models import *
-
-# class Add_Patient_Form(forms.Form):
-#   def __init__(self, *args, **kwargs):
-#       super(Add_Patient_Form, self).__init__(*args, **kwargs)
-
-#   ssn = forms.IntegerField(label="Enter SSN")
-    # self.fields['illness'] = forms.ChoiceField(choices=illness_choices)
 
 
 class NewPersonForm(ModelForm):
@@ -91,6 +86,30 @@ class NewSurgeryForm(ModelForm):
                                      years=range(
                                          date.today().year,
                                          date.today().year + 2))}
+
+
+class Schedule_MedStaffStep1(forms.Form):
+    staff_type = forms.ModelChoiceField(queryset=ContentType.objects.filter(pk__in=[10, 11, 12, 13]))
+
+
+class Schedule_MedStaffForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        if 'staff_type' in kwargs:
+            staff_type = kwargs.pop('staff_type')
+            super(Schedule_MedStaffForm, self).__init__(*args, **kwargs)
+            # staff_model = get_model('HospiPal', staff_type)
+            staff_choice = staff_type.objects.all()
+            staff_id = ContentType.objects.get_for_model(staff_type).id
+            self.fields['staffer'] = forms.ModelChoiceField(queryset=staff_choice)
+            self.fields['content_id'] = forms.IntegerField(widget=forms.HiddenInput(),
+                                                           initial=staff_id,
+                                                           label='')
+
+    shift = forms.DateField(widget=SelectDateWidget(years=range(
+                                                   date.today().year,
+                                                   date.today().year + 2)))
+
+    time = forms.TimeField(initial=datetime.now().strftime('%H:%M'), input_formats=['%H:%M'])
 
 
 class NewSurgeryTypeForm(ModelForm):
@@ -192,11 +211,6 @@ class NewSupportStaffForm(ModelForm):
     class Meta:
         model = SupportStaff
         fields = ['salary_amount']
-
-
-class Prescription(forms.Form):
-    # illness = forms.ModelMultipleChoiceField(queryset=Illness_Type.objects.all())
-    pass
 
 
 class ViewDoctorSchedule(forms.Form):

@@ -2,6 +2,11 @@
 <h1> Roles Held By: {{person}} </h1>
 {% for list in staff_list %}
 {% for member in list %}
-{{member}}
+{{member}}<br>
+skills:{{member.skills.all}}{{member.skill}}<br>
+salary: {{member.salary_amount}}<br>
+years_experience: {{years_experience}}<br>
+grade: {{grade}}<br>
+ownership: {{ownership}}<br>
 {% endfor %}
 {% endfor %}

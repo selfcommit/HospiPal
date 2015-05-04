@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class Person(models.Model):
@@ -299,6 +301,17 @@ class Contract(models.Model):
                                                       self.years,
                                                       self.skills.all()
                                                       )
+
+
+class Schedule(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    staffer = GenericForeignKey('content_type', 'object_id')
+    shift = models.DateTimeField()
+
+    def __unicode__(self):
+        return '%s scheduled for shift  on %s ' % (self.staffer,
+                                                   self.shift.strftime('%D'))
 
 
 class Corporation(models.Model):

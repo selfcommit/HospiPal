@@ -6,6 +6,7 @@ from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404
 from HospiPal.forms import *
 from django.db.models import Q
+from django.db.models import get_model
 from itertools import chain
 import datetime
 
@@ -376,9 +377,17 @@ def Book_Surgery(request):
                                              'step': step})
 
 
-def View_Surgery(request, sid=None):
-    surgery = Surgery.objects.get(pk=sid)
+def View_Surgery(request):
     current_url = request.get_full_path()
+
+    surgerys = Surgery.objects.all()
+
+    return render(request, 'list.html', {'surgerys': surgerys,
+                                         'current_url': current_url})
+
+
+def Surgery_Details(request, sid=None):
+    get_object_or_404(Surgery, pk=sid_id)
 
     return render(request, 'surgery.html', {'surgery': surgery,
                                             'current_url': current_url})
@@ -394,12 +403,19 @@ def Schedule_MedStaff(request):
 
 
 def Search_MedStaff(request):
-    form = SearchStaffForm()
-    staff_list = []
+    doctor_list = Physician.objects.all()
+    nurse_list = Nurse.objects.all()
+    surgeon_list = Surgeon.objects.all()
+    support_list = SupportStaff.objects.all()
+
     current_url = request.get_full_path()
-    return render(request, 'search.html', {'form': form,
-                                           'staff_list': staff_list,
-                                           'current_url': current_url})
+
+    return render(request, 'staff_list.html', {'doctor_list': doctor_list,
+                                               'nurse_list': nurse_list,
+                                               'surgeon_list': surgeon_list,
+                                               'support_list': support_list,
+                                               'current_url': current_url,
+                                               })
 
 
 def Staff_Details(request, staff_id=None):
@@ -444,18 +460,27 @@ def Remove_MedStaff(request):
 
 
 def Remove_Physician(request):
-
-    return HttpResponse('Remove Physician')
+    if request.method == 'POST':
+        staff_id = request.POST.get('staffid', None)
+        p = get_object_or_404(Physician, pk=staff_id)
+        p.delete()
+    return redirect('Remove_MedStaff')
 
 
 def Remove_Nurse(request):
-
-    return HttpResponse('Remove Nurse')
+    if request.method == 'POST':
+        staff_id = request.POST.get('staffid', None)
+        p = get_object_or_404(Nurse, pk=staff_id)
+        p.delete()
+    return redirect('Remove_MedStaff')
 
 
 def Remove_Surgeon(request):
-
-    return HttpResponse('Remove Surgeon')
+    if request.method == 'POST':
+        staff_id = request.POST.get('staffid', None)
+        p = get_object_or_404(Surgeon, pk=staff_id)
+        p.delete()
+    return redirect('Remove_MedStaff')
 
 
 def Add_Physician(request):
@@ -673,11 +698,60 @@ def AddSurgeryType(request):
         form = NewSurgeryTypeForm(request.POST)
         if form.is_valid():
             form.save()
+
     form = NewSurgeryTypeForm()
     thing_list = Surgery_Type.objects.all()
     return render(request, 'add.html', {'form': form,
                                         'current_url': current_url,
                                         'thing_list': thing_list,
                                         'title': title})
+
+
 def Schedule_MedStaff(request):
-    pass
+    form = Schedule_MedStaffStep1()
+    current_url = request.get_full_path()
+    title = 'Step1: Select Staff Type'
+    step = 'step1'
+    if request.method == 'POST':
+        if 'step1' in request.POST:
+            form = Schedule_MedStaffStep1(request.POST)
+            if form.is_valid():
+                step = 'step2'
+                title = 'Step2: Select Staff and Date'
+                staff_id = request.POST.get('staff_type', None)
+                staff_type = ContentType.objects.get(pk=staff_id)
+                staff_type = staff_type.model_class()
+
+                form = Schedule_MedStaffForm(staff_type=staff_type)
+
+                return render(request, 'schedule.html',
+                              {'form': form,
+                               'current_url': current_url,
+                               'step': step,
+                               'title': title
+                               })
+
+        if 'step2' in request.POST:
+            staffer = request.POST.get('staffer', None)
+            content_id = request.POST.get('content_id', None)
+            time = request.POST['time'].split(':')
+            content_id = ContentType.objects.get(pk=content_id)
+            s = Schedule()
+            s.content_type = content_id
+            s.object_id = staffer
+            s.shift = datetime.datetime(
+                    day=int(request.POST['shift_day']),
+                    month=int(request.POST['shift_month']),
+                    year=int(request.POST['shift_year']),
+                    hour=int(time[0]),
+                    minute=int(time[1])
+                    )
+            s.save()
+            return redirect('Schedule_MedStaff')
+
+    appointments = Schedule.objects.all()
+    return render(request, 'schedule.html', {'form': form,
+                                             'current_url': current_url,
+                                             'title': title,
+                                             'appointments': appointments,
+                                             'step': step})

@@ -1,0 +1,76 @@
+{% include 'menu.html' %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{title}}{{search_text}}</h3>
+
+            <div class="tabbable-panel">
+                <div class="tabbable-line">
+                    <ul class="nav nav-tabs ">
+                        <li class="active">
+                            <a href="#tab_default_1" data-toggle="tab">
+                            Doctors</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_2" data-toggle="tab">
+                            Nurses</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_3" data-toggle="tab">
+                            Surgeons</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_4" data-toggle="tab">
+                            Staff</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_default_1">
+                        <br>
+                            
+                            
+                               {% for staffer in doctor_list %}
+                            <br><a href={% url 'Staff_Details' staffer.pk %}> {{staffer}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_2">
+                        <br>
+                            
+                            
+                               {% for staffer in nurse_list %}
+                            <br><a href={% url 'Staff_Details' staffer.pk %}> {{staffer}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_3">
+                        <br>
+                            
+                            
+                               {% for staffer in surgeon_list %}
+                            <br><a href={% url 'Staff_Details' staffer.pk %}> {{staffer}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_4">
+                        <br>
+                            
+                            
+                               {% for staffer in staff_list %}
+                            <br><a href={% url 'Staff_Details' staffer.pk %}> {{staffer}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table>
+<tr>
