@@ -3,14 +3,14 @@
 <table>
 
 <tr>
-<td>Social Security Number:</td><td>{{patient.person.ssn}}</td>
+<td>Social Security Number:</td><td> {{patient.person.ssn}}</td>
 </tr>
 <tr>
 <td>Attending Nurse:</td><td>{{patient.attending_nurse}}</td>
 </tr>
 <td>Nursing Unit:</td><td>{{patient.bed.room.unit}}</td>
 <tr>
-<td>Room Number:</td><td>{{patient.bed.room.color}}</td>
+<td>Room Color:</td><td>{{patient.bed.room.color}}</td>
 </tr>
 <tr>
 <td>Bed:</td><td>{{patient.bed.letter}}</td><td> <a href={% url 'Assign_Bed'%}?patient={{patient.pk}}>Assign a Bed</a> </td>
