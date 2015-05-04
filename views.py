@@ -204,6 +204,8 @@ def Assign_Bed(request):
             patient = Patient.objects.get(pk=request.POST.get('patient', None))
             bed = Bed.objects.get(pk=request.POST.get('bed', None))
             patient.bed = bed
+            bed.available = False
+            bed.save()
             patient.save()
             return redirect('Patient_Details', pat_id=patient.pk)
 
@@ -215,11 +217,11 @@ def Assign_Bed(request):
 
 def Add_Illness(request):
     initial = {'patient': request.GET.get('patient', None)}
-    form = AddIllnessForm(initial=initial)
+    form = NewIllnessForm(initial=initial)
     current_url = request.get_full_path()
     title = 'Assign an Illness'
     if request.method == 'POST':
-        form = AddIllnessForm(request.POST)
+        form = NewIllnessForm(request.POST)
         if form.is_valid():
             patient = Patient.objects.get(pk=request.POST.get('patient', None))
             form.save()
