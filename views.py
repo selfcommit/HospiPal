@@ -369,7 +369,7 @@ def Book_Surgery(request):
                 s.save()
                 form.save_m2m()
                 # https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#the-save-method
-                return redirect('View_Surgery', sid=s.pk)
+                return redirect('Surgery_Details', sid=s.pk)
 
     return render(request, 'schedule.html', {'form': form,
                                              'current_url': current_url,
@@ -387,7 +387,8 @@ def View_Surgery(request):
 
 
 def Surgery_Details(request, sid=None):
-    get_object_or_404(Surgery, pk=sid_id)
+    current_url = request.get_full_path()  
+    surgery = get_object_or_404(Surgery, pk=sid)
 
     return render(request, 'surgery.html', {'surgery': surgery,
                                             'current_url': current_url})
