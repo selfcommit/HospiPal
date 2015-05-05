@@ -1,4 +1,4 @@
 {% include 'menu.html' %}
-{% for item in list %}
-{{item}}
+{% for item in item_list %}
+<a href={% url "Surgery_Details" item.pk %}> {{item}}</a> <br>
 {% endfor %}

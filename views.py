@@ -380,9 +380,9 @@ def Book_Surgery(request):
 def View_Surgery(request):
     current_url = request.get_full_path()
 
-    surgerys = Surgery.objects.all()
+    item_list = Surgery.objects.all()
 
-    return render(request, 'list.html', {'surgerys': surgerys,
+    return render(request, 'list.html', {'item_list': item_list,
                                          'current_url': current_url})
 
 
