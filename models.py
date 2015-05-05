@@ -228,7 +228,7 @@ class Surgery(models.Model):
     def __unicode__(self):
         return 'operation on %s in %s on %s' % (self.patient,
                                                 self.theater,
-                                                self.date_performed.strftime('%D/%M'))
+                                                self.date_performed.strftime('%D'))
 
 
 class Consultation(models.Model):
