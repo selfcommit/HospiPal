@@ -379,10 +379,16 @@ def Book_Surgery(request):
 
 def View_Surgery(request):
     current_url = request.get_full_path()
+    # https://docs.djangoproject.com/en/1.8/ref/models/querysets/#order-by
+    surgerys_by_day = Surgery.objects.all().order_by('date_performed')
+    surgerys_by_doctor = Surgery.objects.all().order_by('surgeons')
+    surgerys_by_patient = Surgery.objects.all().order_by('patient')
+    surgerys_by_theater = Surgery.objects.all().order_by('theater')
 
-    item_list = Surgery.objects.all()
-
-    return render(request, 'list.html', {'item_list': item_list,
+    return render(request, 'list.html', {'surgerys_by_theater': surgerys_by_theater,
+                                         'surgerys_by_patient': surgerys_by_patient,
+                                         'surgerys_by_day': surgerys_by_day,
+                                         'surgerys_by_doctor': surgerys_by_doctor,
                                          'current_url': current_url})
 
 

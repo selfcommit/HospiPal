@@ -1,4 +1,79 @@
 {% include 'menu.html' %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{title}}{{search_text}}</h3>
+
+            <div class="tabbable-panel">
+                <div class="tabbable-line">
+                    <ul class="nav nav-tabs ">
+                        <li class="active">
+                            <a href="#tab_default_1" data-toggle="tab">
+                            By Patient</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_2" data-toggle="tab">
+                            By Theater</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_3" data-toggle="tab">
+                            By Doctor</a>
+                        </li>
+                        <li>
+                            <a href="#tab_default_4" data-toggle="tab">
+                            By Day</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_default_1">
+                        <br>
+                            
+                            
+                               {% for surgery in surgerys_by_patient %}
+                            <br><a href={% url 'Surgery_Details' surgery.pk %}> {{surgery}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_2">
+                        <br>
+                            
+                            
+                               {% for surgery in surgerys_by_theater %}
+                            <br><a href={% url 'Surgery_Details' surgery.pk %}> {{surgery}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_3">
+                        <br>
+                            
+                            
+                               {% for surgery in surgerys_by_doctor %}
+                            <br><a href={% url 'Surgery_Details' surgery.pk %}> {{surgery}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                        <div class="tab-pane" id="tab_default_4">
+                        <br>
+                            
+                                                           
+                               {% for surgery in surgerys_by_day %}
+                            <br><a href={% url 'Surgery_Details' surgery.pk %}> {{surgery}}</a></br>
+                                {% endfor %}
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table>
+<tr>
 {% for item in item_list %}
 <a href={% url "Surgery_Details" item.pk %}> {{item}}</a> <br>
 {% endfor %}
