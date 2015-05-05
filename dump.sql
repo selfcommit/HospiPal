@@ -215,6 +215,13 @@ CREATE TABLE "HospiPal_contract" (
     "years" integer NOT NULL
 )
 ;
+CREATE TABLE "HospiPal_schedule" (
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "content_type_id" integer NOT NULL REFERENCES "django_content_type" ("id"),
+    "object_id" integer unsigned NOT NULL,
+    "shift" datetime NOT NULL
+)
+;
 CREATE TABLE "HospiPal_corporation" (
     "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" varchar(33) NOT NULL UNIQUE,
